@@ -1,4 +1,11 @@
-require("dotenv").config();
+const dotenv = require("dotenv");
+
+dotenv.config({
+  path:
+    process.env.NODE_ENV === "production"
+      ? ".env.production"
+      : ".env.development",
+});
 
 const express = require("express");
 const cors = require("cors");
@@ -7,11 +14,16 @@ const session = require("express-session");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
+// Environment:
+//! Development: npm run dev
+//! Testing: npm test
+//! Production: npm start
+
 const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   }),
 );
@@ -37,7 +49,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:5000/auth/google/callback",
+      callbackURL: `${process.env.BACKEND_URL}/auth/google/callback`,
     },
     (accessToken, refreshToken, profile, done) => {
       return done(null, profile);
@@ -70,11 +82,11 @@ app.get(
 app.get(
   "/auth/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "http://localhost:3000/login",
+    failureRedirect: `${process.env.FRONTEND_URL}/login`,
   }),
 
   (req, res, next) => {
-    res.redirect("http://localhost:3000/user/profile");
+    res.redirect(`${process.env.FRONTEND_URL}/user/profile`);
   },
 );
 
