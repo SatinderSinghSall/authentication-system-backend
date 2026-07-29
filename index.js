@@ -14,6 +14,9 @@ const session = require("express-session");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
+const getConnection = require("./utils/getConnection");
+const googleAuth = require("./middleware/googleAuth");
+
 // Environment:
 //! Development: npm run dev
 //! Testing: npm test
@@ -85,10 +88,14 @@ app.get(
     failureRedirect: `${process.env.FRONTEND_URL}/login`,
   }),
 
+  googleAuth,
+
   (req, res, next) => {
     res.redirect(`${process.env.FRONTEND_URL}/user/profile`);
   },
 );
+
+getConnection();
 
 app.listen(port, () => {
   console.log(`Server's backend is running on port: ${port}`);
