@@ -16,6 +16,9 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 const getConnection = require("./utils/getConnection");
 const googleAuth = require("./middleware/googleAuth");
+const errorHandler = require("./middleware/ErrorHandler");
+
+const userRoutes = require("./routes/user");
 
 // Environment:
 //! Development: npm run dev
@@ -94,6 +97,10 @@ app.get(
     res.redirect(`${process.env.FRONTEND_URL}/user/profile`);
   },
 );
+
+app.use("/user", userRoutes);
+
+app.use(errorHandler);
 
 getConnection();
 
