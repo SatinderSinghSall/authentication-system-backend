@@ -5,28 +5,33 @@ const register = async (req, res, next) => {
   const { name, email, password } = req.body;
 
   try {
-    const foundEmail = await User.findOne({ email: email });
+    // Check if email already exists
+    const foundUser = await User.findOne({ email });
 
-    if (foundEmail) {
+    if (foundUser) {
       const error = new Error(
-        "This user already exists. Try with another email.",
+        "An account with this email address already exists.",
       );
-      error.statusCode = 400;
+      error.statusCode = 409; // Conflict
       throw error;
     }
 
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 15);
+
+    // Create user
     const newUser = new User({
       name,
       email,
       password: hashedPassword,
     });
 
-    const saveUser = await newUser.save();
+    await newUser.save();
 
-    res
-      .status(201)
-      .json({ message: "User registered successfully.", status: true });
+    return res.status(201).json({
+      status: true,
+      message: "Account created successfully.",
+    });
   } catch (error) {
     next(error);
   }
