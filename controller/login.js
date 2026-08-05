@@ -44,7 +44,7 @@ const login = async (req, res, next) => {
     }
 
     // Generate JWT
-    const accessToken = generateToken(foundUser.email);
+    const accessToken = generateToken(foundUser);
 
     // Cookie
     res.cookie("accessToken", accessToken, {
